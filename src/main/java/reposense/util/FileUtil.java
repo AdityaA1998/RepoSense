@@ -1,7 +1,9 @@
 package reposense.util;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -9,13 +11,16 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -26,6 +31,7 @@ import reposense.system.LogsManager;
 
 public class FileUtil {
     private static Logger logger = LogsManager.getLogger(FileUtil.class);
+    private static List<File> files = new ArrayList<>();
 
     private static final String GITHUB_API_DATE_FORMAT = "yyyy-MM-dd";
 
@@ -120,6 +126,64 @@ public class FileUtil {
                 Files.copy(filePath, dest.resolve(src.relativize(filePath)));
             }
         }
+    }
+
+    public static void listf(String directoryName) {
+        File directory = new File(directoryName);
+        // get all the files from a directory
+        File[] fList = directory.listFiles();
+
+        for (File file :fList) {
+            if (file.isFile()) {
+                if (file.getName().endsWith(".json")) {
+                    files.add(file);
+                }
+            } else if (file.isDirectory()) {
+                listf(file.getAbsolutePath());
+            }
+        }
+    }
+
+    public static void zip(String directoryPath, String generatedFolderName) {
+
+        String zipFile = "archiveJSON.zip";
+
+        listf(directoryPath + File.separator + generatedFolderName);
+
+        try {
+
+            // create byte buffer
+            byte[] buffer = new byte[1024];
+            FileOutputStream fos = new FileOutputStream(directoryPath + File.separator + zipFile);
+            ZipOutputStream zos = new ZipOutputStream(fos);
+            for (int i = 0; i < files.size(); i++) {
+                FileInputStream fis = new FileInputStream(files.get(i));
+
+                // begin writing a new ZIP entry, positions the stream to the start of the entry data
+                if (files.get(i).getName().equals("summary.json")) {
+                    zos.putNextEntry(new ZipEntry(files.get(i).getName()));
+                } else {
+                    zos.putNextEntry(new ZipEntry(files.get(i).getParentFile().getName()
+                            + File.separator + files.get(i).getName()));
+                }
+
+                int length;
+
+                while ((length = fis.read(buffer)) > 0) {
+                    zos.write(buffer, 0, length);
+                }
+
+                zos.closeEntry();
+
+                fis.close();
+            }
+
+            zos.close();
+
+        } catch (IOException ioe) {
+            logger.log(Level.SEVERE, ioe.getMessage(), ioe);
+        }
+
     }
 
     private static String attachJsPrefix(String original, String prefix) {
