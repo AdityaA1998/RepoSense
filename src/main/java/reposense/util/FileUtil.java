@@ -137,6 +137,8 @@ public class FileUtil {
                 }
                 zis.closeEntry();
             }
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, e.getMessage(), e);
         }
     }
 
