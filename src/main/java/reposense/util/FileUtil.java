@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -155,7 +156,7 @@ public class FileUtil {
         List<Path> allJsonFiles = listJsonFiles(directoryPath + File.separator + generatedFolder);
 
         //byte buffer for I/O
-        byte[] buffer = new byte[1024];
+        ByteBuffer buffer = ByteBuffer.allocate(1 << 10);
         int length;
         try (FileOutputStream fos = new FileOutputStream(directoryPath + File.separator + zipFileName);
              ZipOutputStream zos = new ZipOutputStream(fos)) {
@@ -170,8 +171,8 @@ public class FileUtil {
                                 + File.separator + allJsonFiles.get(i).getFileName().toString()));
                     }
 
-                    while ((length = fis.read(buffer)) > 0) {
-                        zos.write(buffer, 0, length);
+                    while ((length = fis.read(buffer.array())) > 0) {
+                        zos.write(buffer.array(), 0, length);
                     }
                 }
             }
