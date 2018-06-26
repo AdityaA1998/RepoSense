@@ -1,6 +1,5 @@
 package reposense;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
@@ -28,8 +27,7 @@ public class RepoSense {
             String generatedFolderName = ReportGenerator.generateReposReport(
                     configs, cliArguments.getOutputFilePath().toAbsolutePath().toString());
 
-            FileUtil.zip(cliArguments.getOutputFilePath().toAbsolutePath().toString()
-                    + File.separator + generatedFolderName);
+            FileUtil.zip(cliArguments.getOutputFilePath().toAbsolutePath().toString(), generatedFolderName);
 
         } catch (IOException ioe) {
             logger.log(Level.WARNING, ioe.getMessage(), ioe);
