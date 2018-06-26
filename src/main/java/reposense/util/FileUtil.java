@@ -11,7 +11,6 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
@@ -31,7 +30,6 @@ import reposense.system.LogsManager;
 
 public class FileUtil {
     private static Logger logger = LogsManager.getLogger(FileUtil.class);
-    private static List<File> files = new ArrayList<>();
 
     private static final String GITHUB_API_DATE_FORMAT = "yyyy-MM-dd";
 
@@ -128,53 +126,50 @@ public class FileUtil {
         }
     }
 
-    public static void listf(String directoryName) {
-        File directory = new File(directoryName);
-        // get all the files from a directory
-        File[] fList = directory.listFiles();
+    /**
+     * Generates a list of Path contained in the given {@code directoryName} directory.
+     */
+    public static List<Path> listJsonFiles(String directoryName) throws IOException {
+        Path directory = Paths.get(directoryName);
 
-        for (File file :fList) {
-            if (file.isFile()) {
-                if (file.getName().endsWith(".json")) {
-                    files.add(file);
-                }
-            } else if (file.isDirectory()) {
-                listf(file.getAbsolutePath());
-            }
-        }
+        List<Path> allJsonFiles = Files.walk(directory)
+                .filter(p -> p.toString().endsWith(".json"))
+                .distinct()
+                .collect(Collectors.toList());
+
+        return allJsonFiles;
     }
 
-    public static void zip(String directoryPath, String generatedFolderName) {
+    /**
+     * Zips all the JSON files contained in the {@directoryPath} directory.
+     */
+    public static void zip(String directoryPath) throws IOException {
 
-        String zipFile = "archiveJSON.zip";
+        String zipFileName = "archiveJSON.zip";
 
-        listf(directoryPath + File.separator + generatedFolderName);
+        List<Path> allJsonFiles = listJsonFiles(directoryPath);
 
         try {
-
-            // create byte buffer
+            //byte buffer for I/O
             byte[] buffer = new byte[1024];
-            FileOutputStream fos = new FileOutputStream(directoryPath + File.separator + zipFile);
+            int length;
+            FileOutputStream fos = new FileOutputStream(directoryPath + File.separator + zipFileName);
             ZipOutputStream zos = new ZipOutputStream(fos);
-            for (int i = 0; i < files.size(); i++) {
-                FileInputStream fis = new FileInputStream(files.get(i));
+            for (int i = 0; i < allJsonFiles.size(); i++) {
+                FileInputStream fis = new FileInputStream(allJsonFiles.get(i).toFile());
 
                 // begin writing a new ZIP entry, positions the stream to the start of the entry data
-                if (files.get(i).getName().equals("summary.json")) {
-                    zos.putNextEntry(new ZipEntry(files.get(i).getName()));
+                if (isSummaryJson(allJsonFiles.get(i))) {
+                    zos.putNextEntry(new ZipEntry(allJsonFiles.get(i).getFileName().toString()));
                 } else {
-                    zos.putNextEntry(new ZipEntry(files.get(i).getParentFile().getName()
-                            + File.separator + files.get(i).getName()));
+                    zos.putNextEntry(new ZipEntry(allJsonFiles.get(i).getParent().getFileName()
+                            + File.separator + allJsonFiles.get(i).getFileName()));
                 }
-
-                int length;
 
                 while ((length = fis.read(buffer)) > 0) {
                     zos.write(buffer, 0, length);
                 }
-
                 zos.closeEntry();
-
                 fis.close();
             }
 
@@ -188,6 +183,10 @@ public class FileUtil {
 
     private static String attachJsPrefix(String original, String prefix) {
         return "var " + prefix + " = " + original;
+    }
+
+    private static boolean isSummaryJson(Path path) {
+        return path.getFileName().toString().equals("summary.json");
     }
 
 }
