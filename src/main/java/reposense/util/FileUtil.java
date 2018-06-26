@@ -129,13 +129,17 @@ public class FileUtil {
     /**
      * Generates a list of Path contained in the given {@code directoryName} directory.
      */
-    public static List<Path> listJsonFiles(String directoryName) throws IOException {
+    public static List<Path> listJsonFiles(String directoryName) {
         Path directory = Paths.get(directoryName);
-
-        List<Path> allJsonFiles = Files.walk(directory)
-                .filter(p -> p.toString().endsWith(".json"))
-                .distinct()
-                .collect(Collectors.toList());
+        List<Path> allJsonFiles = null;
+        try {
+            allJsonFiles = Files.walk(directory)
+                    .filter(p -> p.toString().endsWith(".json"))
+                    .distinct()
+                    .collect(Collectors.toList());
+        } catch (IOException ioe) {
+            logger.log(Level.SEVERE, ioe.getMessage(), ioe);
+        }
 
         return allJsonFiles;
     }
@@ -144,7 +148,7 @@ public class FileUtil {
      * Zips all the JSON files contained in the {@generatedFolder} directory.
      * Creates the zip folder in the {@code directoryPath}
      */
-    public static void zip(String directoryPath, String generatedFolder) throws IOException {
+    public static void zip(String directoryPath, String generatedFolder) {
 
         String zipFileName = "archiveJSON.zip";
 
