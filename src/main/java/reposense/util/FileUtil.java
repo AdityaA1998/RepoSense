@@ -146,19 +146,17 @@ public class FileUtil {
     }
 
     /**
-     * Zips all the JSON files contained in the {@generatedFolder} directory.
-     * Creates the zip folder in the {@code directoryPath}
+     * Zips all the JSON files contained in the {@code sourcePath} directory.
+     * Creates the zip folder in the {@code outputPath}
      */
-    public static void zip(String directoryPath, String generatedFolder) {
-
+    public static void zipJson(String outputPath, String sourcePath) {
         String zipFileName = "archiveJSON.zip";
-
-        List<Path> allJsonFiles = listJsonFiles(directoryPath + File.separator + generatedFolder);
+        List<Path> allJsonFiles = listJsonFiles(outputPath + File.separator + sourcePath);
 
         //byte buffer for I/O
         ByteBuffer buffer = ByteBuffer.allocate(1 << 10);
         int length;
-        try (FileOutputStream fos = new FileOutputStream(directoryPath + File.separator + zipFileName);
+        try (FileOutputStream fos = new FileOutputStream(outputPath + File.separator + zipFileName);
              ZipOutputStream zos = new ZipOutputStream(fos)) {
             for (int i = 0; i < allJsonFiles.size(); i++) {
                 try (FileInputStream fis = new FileInputStream(allJsonFiles.get(i).toFile())) {
@@ -179,7 +177,6 @@ public class FileUtil {
         } catch (IOException ioe) {
             logger.log(Level.SEVERE, ioe.getMessage(), ioe);
         }
-
     }
 
     private static String attachJsPrefix(String original, String prefix) {
@@ -187,7 +184,7 @@ public class FileUtil {
     }
 
     /**
-     * Checks if the given {@path} is of summary.json
+     * Checks if the given {@code path} is of summary.json
      */
     private static boolean isSummaryJson(Path path) {
         return path.getFileName().toString().equals("summary.json");
