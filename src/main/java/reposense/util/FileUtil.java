@@ -128,21 +128,21 @@ public class FileUtil {
     }
 
     /**
-     * Generates a list of Path contained in the given {@code directoryName} directory.
+     * Generates a list of paths of {@code fileType} contained in the given {@code directoryName} directory.
      */
-    public static List<Path> listJsonFiles(String directoryName) {
+    public static List<Path> listFilePath(String directoryName, String fileType) {
         Path directory = Paths.get(directoryName);
-        List<Path> allJsonFiles = null;
+        List<Path> filePaths = null;
         try {
-            allJsonFiles = Files.walk(directory)
-                    .filter(p -> p.toString().endsWith(".json"))
+            filePaths = Files.walk(directory)
+                    .filter(p -> p.toString().endsWith(fileType))
                     .distinct()
                     .collect(Collectors.toList());
         } catch (IOException ioe) {
             logger.log(Level.SEVERE, ioe.getMessage(), ioe);
         }
 
-        return allJsonFiles;
+        return filePaths;
     }
 
     /**
@@ -150,19 +150,19 @@ public class FileUtil {
      * Creates the zip folder in the {@code outputPath}
      */
     public static void zipJson(String outputPath, String sourcePath) {
-        String zipFileName = "archiveJSON.zip";
-        List<Path> allJsonFiles = listJsonFiles(outputPath + File.separator + sourcePath);
+        String summaryJson = "summary.json";
+        List<Path> allJsonFiles = listFilePath(outputPath + File.separator + sourcePath, ".json");
 
         //byte buffer for I/O
         ByteBuffer buffer = ByteBuffer.allocate(1 << 10);
         int length;
-        try (FileOutputStream fos = new FileOutputStream(outputPath + File.separator + zipFileName);
+        try (FileOutputStream fos = new FileOutputStream(outputPath + File.separator + Constants.JSON_ZIP_FILE);
              ZipOutputStream zos = new ZipOutputStream(fos)) {
             for (int i = 0; i < allJsonFiles.size(); i++) {
                 try (FileInputStream fis = new FileInputStream(allJsonFiles.get(i).toFile())) {
 
                     // begin writing a new ZIP entry, positions the stream to the start of the entry data
-                    if (isSummaryJson(allJsonFiles.get(i))) {
+                    if (isFilePathValid(allJsonFiles.get(i), summaryJson)) {
                         zos.putNextEntry(new ZipEntry(allJsonFiles.get(i).getFileName().toString()));
                     } else {
                         zos.putNextEntry(new ZipEntry(allJsonFiles.get(i).getParent().getFileName().toString()
@@ -184,10 +184,10 @@ public class FileUtil {
     }
 
     /**
-     * Checks if the given {@code path} is of summary.json
+     * Checks if the given {@code path} is of {@code file}
      */
-    private static boolean isSummaryJson(Path path) {
-        return path.getFileName().toString().equals("summary.json");
+    private static boolean isFilePathValid(Path path, String file) {
+        return path.getFileName().toString().equals(file);
     }
 
 }
