@@ -73,7 +73,7 @@ public class FileUtil {
         int length;
         try (FileOutputStream fos = new FileOutputStream(outputPath + File.separator + Constants.JSON_ZIP_FILE);
              ZipOutputStream zos = new ZipOutputStream(fos)) {
-            for (Path jsonFile: allJsonFiles) {
+            for (Path jsonFile : allJsonFiles) {
                 try (FileInputStream fis = new FileInputStream(jsonFile.toFile())) {
                     zos.putNextEntry(new ZipEntry(getChild(jsonFile.toString(), sourcePath + File.separator)));
                     while ((length = fis.read(buffer.array())) > 0) {
@@ -88,36 +88,31 @@ public class FileUtil {
 
     /**
      * Unzips the contents of the {@code zipInput} and stores in the {@code destinationFolder}
-     * */
+     */
     public static void unzip(ZipInputStream zipInput, String destinationFolder) {
-
         ByteBuffer buffer = ByteBuffer.allocate(1 << 11);
-        try {
+        ZipEntry entry;
+        try (ZipInputStream zi = zipInput) {
             Files.createDirectories(Paths.get(destinationFolder));
-            ZipEntry entry = zipInput.getNextEntry();
-
-            while (entry != null) {
+            while ((entry = zi.getNextEntry()) != null) {
                 Path path = Paths.get(destinationFolder, entry.getName());
                 // create the directories of the zip directory
                 if (entry.isDirectory()) {
                     Files.createDirectories(path.toAbsolutePath());
-                } else {
-                    if (!Files.exists(path.getParent())) {
-                        Files.createDirectories(path.getParent());
-                    }
-                    try (OutputStream output = Files.newOutputStream(path)) {
-                        int count;
-                        while ((count = zipInput.read(buffer.array())) > 0) {
-                            output.write(buffer.array(), 0, count);
-                        }
+                    zi.closeEntry();
+                    continue;
+                }
+                if (!Files.exists(path.getParent())) {
+                    Files.createDirectories(path.getParent());
+                }
+                try (OutputStream output = Files.newOutputStream(path)) {
+                    int count;
+                    while ((count = zi.read(buffer.array())) > 0) {
+                        output.write(buffer.array(), 0, count);
                     }
                 }
-                zipInput.closeEntry();
-                entry = zipInput.getNextEntry();
+                zi.closeEntry();
             }
-
-            zipInput.closeEntry();
-            zipInput.close();
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
         }
@@ -164,7 +159,7 @@ public class FileUtil {
 
     /**
      * Returns the child contained in the {@sourcePath} of the {@code fullPath}
-     * */
+     */
     private static String getChild(String fullPath, String sourcePath) {
         return fullPath.substring(fullPath.indexOf(sourcePath) + sourcePath.length());
     }
