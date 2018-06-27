@@ -65,9 +65,7 @@ public class FileUtil {
     public static void unzip(ZipInputStream zipInput, String destinationFolder) {
         Path directory = Paths.get(destinationFolder);
 
-        // buffer for read and write data to file
-        byte[] buffer = new byte[2048];
-
+        ByteBuffer buffer = ByteBuffer.allocate(1 << 11);
         try {
             Files.createDirectories(directory);
             ZipEntry entry = zipInput.getNextEntry();
@@ -83,22 +81,18 @@ public class FileUtil {
                     if (!Files.exists(path.getParent())) {
                         Files.createDirectories(path.getParent());
                     }
-                    OutputStream output = Files.newOutputStream(path);
-                    int count = 0;
-                    while ((count = zipInput.read(buffer)) > 0) {
-                        // write 'count' bytes to the file output stream
-                        output.write(buffer, 0, count);
+                    try (OutputStream output = Files.newOutputStream(path)) {
+                        int count;
+                        while ((count = zipInput.read(buffer.array())) > 0) {
+                            output.write(buffer.array(), 0, count);
+                        }
                     }
-                    output.close();
                 }
-                // close ZipEntry and take the next one
                 zipInput.closeEntry();
                 entry = zipInput.getNextEntry();
             }
 
-            // close the last ZipEntry
             zipInput.closeEntry();
-
             zipInput.close();
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
@@ -149,25 +143,15 @@ public class FileUtil {
      * Creates the zip folder in the {@code outputPath}
      */
     public static void zipJson(String outputPath, String sourcePath) {
-        String summaryJson = "summary.json";
         List<Path> allJsonFiles = getFilePath(outputPath + File.separator + sourcePath, ".json");
 
-        //byte buffer for I/O
         ByteBuffer buffer = ByteBuffer.allocate(1 << 10);
         int length;
         try (FileOutputStream fos = new FileOutputStream(outputPath + File.separator + Constants.JSON_ZIP_FILE);
              ZipOutputStream zos = new ZipOutputStream(fos)) {
             for (Path jsonFile: allJsonFiles) {
                 try (FileInputStream fis = new FileInputStream(jsonFile.toFile())) {
-
-                    // begin writing a new ZIP entry, positions the stream to the start of the entry data
-                    if (checkFileName(jsonFile, summaryJson)) {
-                        zos.putNextEntry(new ZipEntry(jsonFile.getFileName().toString()));
-                    } else {
-                        zos.putNextEntry(new ZipEntry(jsonFile.getParent().getFileName().toString()
-                                + File.separator + jsonFile.getFileName().toString()));
-                    }
-
+                    zos.putNextEntry(new ZipEntry(getChild(jsonFile.toString(), sourcePath + File.separator)));
                     while ((length = fis.read(buffer.array())) > 0) {
                         zos.write(buffer.array(), 0, length);
                     }
@@ -178,15 +162,14 @@ public class FileUtil {
         }
     }
 
+    /**
+     * Returns the child contained in the {@sourcePath} of the {@code fullPath}
+     * */
+    private static String getChild(String fullPath, String sourcePath) {
+        return fullPath.substring(fullPath.indexOf(sourcePath) + sourcePath.length());
+    }
+
     private static String attachJsPrefix(String original, String prefix) {
         return "var " + prefix + " = " + original;
     }
-
-    /**
-     * Checks if the given {@code path} is of {@code file}
-     */
-    private static boolean checkFileName(Path path, String file) {
-        return path.getFileName().toString().equals(file);
-    }
-
 }
