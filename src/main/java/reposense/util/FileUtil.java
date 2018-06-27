@@ -62,21 +62,45 @@ public class FileUtil {
         }
     }
 
+    /**
+     * Zips all the JSON files contained in the {@code sourcePath} directory.
+     * Creates the zip folder in the {@code outputPath}
+     */
+    public static void zipJson(String outputPath, String sourcePath) {
+        List<Path> allJsonFiles = getFilePath(outputPath + File.separator + sourcePath, ".json");
+
+        ByteBuffer buffer = ByteBuffer.allocate(1 << 10);
+        int length;
+        try (FileOutputStream fos = new FileOutputStream(outputPath + File.separator + Constants.JSON_ZIP_FILE);
+             ZipOutputStream zos = new ZipOutputStream(fos)) {
+            for (Path jsonFile: allJsonFiles) {
+                try (FileInputStream fis = new FileInputStream(jsonFile.toFile())) {
+                    zos.putNextEntry(new ZipEntry(getChild(jsonFile.toString(), sourcePath + File.separator)));
+                    while ((length = fis.read(buffer.array())) > 0) {
+                        zos.write(buffer.array(), 0, length);
+                    }
+                }
+            }
+        } catch (IOException ioe) {
+            logger.log(Level.SEVERE, ioe.getMessage(), ioe);
+        }
+    }
+
+    /**
+     * Unzips the contents of the {@code zipInput} and stores in the {@code destinationFolder}
+     * */
     public static void unzip(ZipInputStream zipInput, String destinationFolder) {
-        Path directory = Paths.get(destinationFolder);
 
         ByteBuffer buffer = ByteBuffer.allocate(1 << 11);
         try {
-            Files.createDirectories(directory);
+            Files.createDirectories(Paths.get(destinationFolder));
             ZipEntry entry = zipInput.getNextEntry();
 
             while (entry != null) {
-                String entryName = entry.getName();
-                Path path = Paths.get(destinationFolder, entryName);
+                Path path = Paths.get(destinationFolder, entry.getName());
                 // create the directories of the zip directory
                 if (entry.isDirectory()) {
-                    Path newDir = Paths.get(path.toAbsolutePath().toString());
-                    Files.createDirectories(newDir);
+                    Files.createDirectories(path.toAbsolutePath());
                 } else {
                     if (!Files.exists(path.getParent())) {
                         Files.createDirectories(path.getParent());
@@ -136,30 +160,6 @@ public class FileUtil {
             logger.log(Level.SEVERE, ioe.getMessage(), ioe);
         }
         return filePaths;
-    }
-
-    /**
-     * Zips all the JSON files contained in the {@code sourcePath} directory.
-     * Creates the zip folder in the {@code outputPath}
-     */
-    public static void zipJson(String outputPath, String sourcePath) {
-        List<Path> allJsonFiles = getFilePath(outputPath + File.separator + sourcePath, ".json");
-
-        ByteBuffer buffer = ByteBuffer.allocate(1 << 10);
-        int length;
-        try (FileOutputStream fos = new FileOutputStream(outputPath + File.separator + Constants.JSON_ZIP_FILE);
-             ZipOutputStream zos = new ZipOutputStream(fos)) {
-            for (Path jsonFile: allJsonFiles) {
-                try (FileInputStream fis = new FileInputStream(jsonFile.toFile())) {
-                    zos.putNextEntry(new ZipEntry(getChild(jsonFile.toString(), sourcePath + File.separator)));
-                    while ((length = fis.read(buffer.array())) > 0) {
-                        zos.write(buffer.array(), 0, length);
-                    }
-                }
-            }
-        } catch (IOException ioe) {
-            logger.log(Level.SEVERE, ioe.getMessage(), ioe);
-        }
     }
 
     /**
