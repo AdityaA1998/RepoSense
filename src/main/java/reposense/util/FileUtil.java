@@ -148,7 +148,6 @@ public class FileUtil {
         try {
             filePaths = Files.walk(directory)
                     .filter(p -> p.toString().endsWith(fileType))
-                    .distinct()
                     .collect(Collectors.toList());
         } catch (IOException ioe) {
             logger.log(Level.SEVERE, ioe.getMessage(), ioe);
