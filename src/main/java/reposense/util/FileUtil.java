@@ -91,14 +91,14 @@ public class FileUtil {
      */
     public static void unzip(InputStream is, String destinationFolder) {
         ZipEntry entry;
-        try (ZipInputStream zi = new ZipInputStream(is)) {
+        try (ZipInputStream zis = new ZipInputStream(is)) {
             Files.createDirectories(Paths.get(destinationFolder));
-            while ((entry = zi.getNextEntry()) != null) {
+            while ((entry = zis.getNextEntry()) != null) {
                 Path path = Paths.get(destinationFolder, entry.getName());
                 // create the directories of the zip directory
                 if (entry.isDirectory()) {
                     Files.createDirectories(path.toAbsolutePath());
-                    zi.closeEntry();
+                    zis.closeEntry();
                     continue;
                 }
                 if (!Files.exists(path.getParent())) {
@@ -106,11 +106,11 @@ public class FileUtil {
                 }
                 try (OutputStream output = Files.newOutputStream(path)) {
                     int length;
-                    while ((length = zi.read(buffer.array())) > 0) {
+                    while ((length = zis.read(buffer.array())) > 0) {
                         output.write(buffer.array(), 0, length);
                     }
                 }
-                zi.closeEntry();
+                zis.closeEntry();
             }
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
