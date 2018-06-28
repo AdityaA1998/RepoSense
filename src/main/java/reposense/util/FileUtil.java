@@ -1,7 +1,6 @@
 package reposense.util;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -33,6 +32,8 @@ public class FileUtil {
     private static Logger logger = LogsManager.getLogger(FileUtil.class);
 
     private static final String GITHUB_API_DATE_FORMAT = "yyyy-MM-dd";
+    private static final ByteBuffer buffer = ByteBuffer.allocate(1 << 11);
+
 
     public static void writeJsonFile(Object object, String path) {
         Gson gson = new GsonBuilder()
@@ -69,14 +70,13 @@ public class FileUtil {
     public static void zipJson(String outputPath, String sourcePath) {
         List<Path> allJsonFiles = getFilePath(outputPath + File.separator + sourcePath, ".json");
 
-        ByteBuffer buffer = ByteBuffer.allocate(1 << 10);
         int length;
         try (FileOutputStream fos = new FileOutputStream(outputPath + File.separator + Constants.JSON_ZIP_FILE);
              ZipOutputStream zos = new ZipOutputStream(fos)) {
             for (Path jsonFile : allJsonFiles) {
-                try (FileInputStream fis = new FileInputStream(jsonFile.toFile())) {
+                try (InputStream is = Files.newInputStream(jsonFile)) {
                     zos.putNextEntry(new ZipEntry(getChild(jsonFile.toString(), sourcePath + File.separator)));
-                    while ((length = fis.read(buffer.array())) > 0) {
+                    while ((length = is.read(buffer.array())) > 0) {
                         zos.write(buffer.array(), 0, length);
                     }
                 }
@@ -87,12 +87,11 @@ public class FileUtil {
     }
 
     /**
-     * Unzips the contents of the {@code zipInput} and stores in the {@code destinationFolder}
+     * Unzips the contents of the {@code zis} and stores in the {@code destinationFolder}
      */
-    public static void unzip(ZipInputStream zipInput, String destinationFolder) {
-        ByteBuffer buffer = ByteBuffer.allocate(1 << 11);
+    public static void unzip(ZipInputStream zis, String destinationFolder) {
         ZipEntry entry;
-        try (ZipInputStream zi = zipInput) {
+        try (ZipInputStream zi = zis) {
             Files.createDirectories(Paths.get(destinationFolder));
             while ((entry = zi.getNextEntry()) != null) {
                 Path path = Paths.get(destinationFolder, entry.getName());
@@ -106,9 +105,9 @@ public class FileUtil {
                     Files.createDirectories(path.getParent());
                 }
                 try (OutputStream output = Files.newOutputStream(path)) {
-                    int count;
-                    while ((count = zi.read(buffer.array())) > 0) {
-                        output.write(buffer.array(), 0, count);
+                    int length;
+                    while ((length = zi.read(buffer.array())) > 0) {
+                        output.write(buffer.array(), 0, length);
                     }
                 }
                 zi.closeEntry();
@@ -141,7 +140,7 @@ public class FileUtil {
     }
 
     /**
-     * Returns a list of paths of {@code fileType} contained in the given {@code directoryName} directory.
+     * Returns a list of {@code Path} of {@code fileType} contained in the given {@code directoryName} directory.
      */
     private static List<Path> getFilePath(String directoryName, String fileType) {
         Path directory = Paths.get(directoryName);
@@ -158,7 +157,7 @@ public class FileUtil {
     }
 
     /**
-     * Returns the child contained in the {@sourcePath} of the {@code fullPath}
+     * Returns the child contained in the {@code sourcePath} of the {@code fullPath}
      */
     private static String getChild(String fullPath, String sourcePath) {
         return fullPath.substring(fullPath.indexOf(sourcePath) + sourcePath.length());
