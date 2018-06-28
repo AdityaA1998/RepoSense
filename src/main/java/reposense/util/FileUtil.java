@@ -68,11 +68,11 @@ public class FileUtil {
      * Creates the zip folder in the {@code outputPath}
      */
     public static void zipJson(String outputPath, String sourcePath) {
-        List<Path> allJsonFiles = getFilePath(outputPath + File.separator + sourcePath, ".json");
 
         int length;
         try (FileOutputStream fos = new FileOutputStream(outputPath + File.separator + Constants.JSON_ZIP_FILE);
              ZipOutputStream zos = new ZipOutputStream(fos)) {
+            List<Path> allJsonFiles = getFilePaths(outputPath + File.separator + sourcePath, ".json");
             for (Path jsonFile : allJsonFiles) {
                 try (InputStream is = Files.newInputStream(jsonFile)) {
                     zos.putNextEntry(new ZipEntry(getChild(jsonFile.toString(), sourcePath + File.separator)));
@@ -87,11 +87,11 @@ public class FileUtil {
     }
 
     /**
-     * Unzips the contents of the {@code zis} and stores in the {@code destinationFolder}
+     * Unzips the contents of the {@code is} and stores in the {@code destinationFolder}
      */
-    public static void unzip(ZipInputStream zis, String destinationFolder) {
+    public static void unzip(InputStream is, String destinationFolder) {
         ZipEntry entry;
-        try (ZipInputStream zi = zis) {
+        try (ZipInputStream zi = new ZipInputStream(is)) {
             Files.createDirectories(Paths.get(destinationFolder));
             while ((entry = zi.getNextEntry()) != null) {
                 Path path = Paths.get(destinationFolder, entry.getName());
@@ -123,7 +123,7 @@ public class FileUtil {
     public static void copyTemplate(String outputPath, String reportName) {
         String templateLocation = outputPath + File.separator + reportName;
         InputStream is = RepoSense.class.getResourceAsStream(Constants.TEMPLATE_ZIP_ADDRESS);
-        FileUtil.unzip(new ZipInputStream(is), templateLocation);
+        FileUtil.unzip(is, templateLocation);
     }
 
     /**
@@ -142,16 +142,12 @@ public class FileUtil {
     /**
      * Returns a list of {@code Path} of {@code fileType} contained in the given {@code directoryName} directory.
      */
-    private static List<Path> getFilePath(String directoryName, String fileType) {
+    private static List<Path> getFilePaths(String directoryName, String fileType) throws IOException {
         Path directory = Paths.get(directoryName);
-        List<Path> filePaths = null;
-        try {
-            filePaths = Files.walk(directory)
-                    .filter(p -> p.toString().endsWith(fileType))
-                    .collect(Collectors.toList());
-        } catch (IOException ioe) {
-            logger.log(Level.SEVERE, ioe.getMessage(), ioe);
-        }
+        List<Path> filePaths;
+        filePaths = Files.walk(directory)
+                .filter(p -> p.toString().endsWith(fileType))
+                .collect(Collectors.toList());
         return filePaths;
     }
 
