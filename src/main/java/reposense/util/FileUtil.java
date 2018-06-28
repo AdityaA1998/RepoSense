@@ -67,7 +67,7 @@ public class FileUtil {
      * Zips all the JSON files contained in the {@code sourcePath} directory.
      * Creates the zip folder in the {@code outputPath}.
      */
-    public static void zipJson(String outputPath, String sourcePath) {
+    public static void zipJson(String sourcePath, String outputPath) {
         int length;
         try (FileOutputStream fos = new FileOutputStream(outputPath + File.separator + Constants.JSON_ZIP_FILE);
              ZipOutputStream zos = new ZipOutputStream(fos)) {
@@ -86,14 +86,15 @@ public class FileUtil {
     }
 
     /**
-     * Unzips the contents of the {@code is} and stores in the {@code destinationFolder}.
+     * Unzips the contents of the {@code zipSourcePath} and stores in the {@code outputPath}.
      */
-    public static void unzip(InputStream is, String destinationFolder) {
+    public static void unzip(String zipSourcePath, String outputPath) {
         ZipEntry entry;
-        try (ZipInputStream zis = new ZipInputStream(is)) {
-            Files.createDirectories(Paths.get(destinationFolder));
+        try (InputStream is = RepoSense.class.getResourceAsStream(zipSourcePath);
+             ZipInputStream zis = new ZipInputStream(is)) {
+            Files.createDirectories(Paths.get(outputPath));
             while ((entry = zis.getNextEntry()) != null) {
-                Path path = Paths.get(destinationFolder, entry.getName());
+                Path path = Paths.get(outputPath, entry.getName());
                 // create the directories of the zip directory
                 if (entry.isDirectory()) {
                     Files.createDirectories(path.toAbsolutePath());
@@ -121,8 +122,7 @@ public class FileUtil {
      */
     public static void copyTemplate(String outputPath, String reportName) {
         String templateLocation = outputPath + File.separator + reportName;
-        InputStream is = RepoSense.class.getResourceAsStream(Constants.TEMPLATE_ZIP_ADDRESS);
-        FileUtil.unzip(is, templateLocation);
+        FileUtil.unzip(Constants.TEMPLATE_ZIP_ADDRESS, templateLocation);
     }
 
     /**

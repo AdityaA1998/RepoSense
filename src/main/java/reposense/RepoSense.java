@@ -27,7 +27,7 @@ public class RepoSense {
             String generatedFolderName = ReportGenerator.generateReposReport(
                     configs, cliArguments.getOutputFilePath().toAbsolutePath().toString());
 
-            FileUtil.zipJson(cliArguments.getOutputFilePath().toAbsolutePath().toString(), generatedFolderName);
+            FileUtil.zipJson(generatedFolderName, cliArguments.getOutputFilePath().toAbsolutePath().toString());
 
         } catch (IOException ioe) {
             logger.log(Level.WARNING, ioe.getMessage(), ioe);
