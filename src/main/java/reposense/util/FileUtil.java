@@ -65,10 +65,9 @@ public class FileUtil {
 
     /**
      * Zips all the JSON files contained in the {@code sourcePath} directory.
-     * Creates the zip folder in the {@code outputPath}
+     * Creates the zip folder in the {@code outputPath}.
      */
     public static void zipJson(String outputPath, String sourcePath) {
-
         int length;
         try (FileOutputStream fos = new FileOutputStream(outputPath + File.separator + Constants.JSON_ZIP_FILE);
              ZipOutputStream zos = new ZipOutputStream(fos)) {
@@ -87,7 +86,7 @@ public class FileUtil {
     }
 
     /**
-     * Unzips the contents of the {@code is} and stores in the {@code destinationFolder}
+     * Unzips the contents of the {@code is} and stores in the {@code destinationFolder}.
      */
     public static void unzip(InputStream is, String destinationFolder) {
         ZipEntry entry;
@@ -152,7 +151,7 @@ public class FileUtil {
     }
 
     /**
-     * Returns the child contained in the {@code sourcePath} of the {@code fullPath}
+     * Returns the child contained in the {@code sourcePath} of the {@code fullPath}.
      */
     private static String getChild(String fullPath, String sourcePath) {
         return fullPath.substring(fullPath.indexOf(sourcePath) + sourcePath.length());
