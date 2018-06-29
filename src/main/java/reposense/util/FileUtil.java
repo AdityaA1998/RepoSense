@@ -148,7 +148,6 @@ public class FileUtil {
      * Returns a list of {@code Path} of {@code fileType} contained in the given {@code directoryPath} directory.
      */
     private static List<Path> getFilePaths(Path directoryPath, String fileType) throws IOException {
-        //Path directory = Paths.get(directoryName);
         List<Path> filePaths;
         filePaths = Files.walk(directoryPath)
                 .filter(p -> p.toString().endsWith(fileType))
