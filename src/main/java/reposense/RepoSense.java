@@ -1,7 +1,6 @@
 package reposense;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,11 +24,10 @@ public class RepoSense {
             List<RepoConfiguration> configs = CsvParser.parse(cliArguments.getConfigFilePath());
             RepoConfiguration.setDatesToRepoConfigs(configs, cliArguments.getSinceDate(), cliArguments.getUntilDate());
 
-            String generatedFolderName = ReportGenerator.generateReposReport(
+            ReportGenerator.generateReposReport(
                     configs, cliArguments.getOutputFilePath().toAbsolutePath().toString());
 
-            FileUtil.zipJson(Paths.get(generatedFolderName).toAbsolutePath(),
-                    cliArguments.getOutputFilePath().toAbsolutePath());
+            FileUtil.zipJson(cliArguments.getOutputFilePath().toAbsolutePath());
 
         } catch (IOException ioe) {
             logger.log(Level.WARNING, ioe.getMessage(), ioe);

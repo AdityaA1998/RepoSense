@@ -64,13 +64,13 @@ public class FileUtil {
     }
 
     /**
-     * Zips all the JSON files contained in the {@code sourcePath} directory.
-     * Creates the zipped folder in the {@code outputPath}.
+     * Zips all the JSON files contained in the {@code sourcePath} and its subdirectories.
+     * Creates the zipped folder in the {@code sourcePath}.
      */
-    public static void zipJson(Path sourcePath, Path outputPath) {
+    public static void zipJson(Path sourcePath) {
         int length;
         try (FileOutputStream fos =
-                     new FileOutputStream(outputPath + File.separator + JSON_ZIP_FILE);
+                     new FileOutputStream(sourcePath + File.separator + JSON_ZIP_FILE);
              ZipOutputStream zos =
                      new ZipOutputStream(fos)
         ) {
@@ -124,11 +124,10 @@ public class FileUtil {
     }
 
     /**
-     * Copies the template files to the {@code outputPath}'s {@code reportName} directory.
+     * Copies the template files to the {@code outputPath}.
      */
-    public static void copyTemplate(String outputPath, String reportName) {
-        String templateLocation = outputPath + File.separator + reportName;
-        FileUtil.unzip(Constants.TEMPLATE_ZIP_ADDRESS, templateLocation);
+    public static void copyTemplate(String outputPath) {
+        FileUtil.unzip(Constants.TEMPLATE_ZIP_ADDRESS, outputPath);
     }
 
     /**
