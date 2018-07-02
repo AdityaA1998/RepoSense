@@ -33,7 +33,7 @@ public class FileUtil {
 
     private static final String GITHUB_API_DATE_FORMAT = "yyyy-MM-dd";
     private static final String JSON_ZIP_FILE = "archiveJSON.zip";
-    private static final ByteBuffer buffer = ByteBuffer.allocate(1 << 11); //2KB
+    private static final ByteBuffer buffer = ByteBuffer.allocate(1 << 11); // 2KB
 
     public static void writeJsonFile(Object object, String path) {
         Gson gson = new GsonBuilder()
@@ -143,11 +143,9 @@ public class FileUtil {
      * Returns a list of {@code Path} of {@code fileType} contained in the given {@code directoryPath} directory.
      */
     private static List<Path> getFilePaths(Path directoryPath, String fileType) throws IOException {
-        List<Path> filePaths;
-        filePaths = Files.walk(directoryPath)
+        return Files.walk(directoryPath)
                 .filter(p -> p.toString().endsWith(fileType))
                 .collect(Collectors.toList());
-        return filePaths;
     }
 
     private static String attachJsPrefix(String original, String prefix) {

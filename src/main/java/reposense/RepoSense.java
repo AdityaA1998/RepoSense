@@ -28,7 +28,6 @@ public class RepoSense {
                     configs, cliArguments.getOutputFilePath().toAbsolutePath().toString());
 
             FileUtil.zipJson(cliArguments.getOutputFilePath().toAbsolutePath());
-
         } catch (IOException ioe) {
             logger.log(Level.WARNING, ioe.getMessage(), ioe);
         } catch (ParseException pe) {
