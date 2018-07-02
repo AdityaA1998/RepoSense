@@ -69,10 +69,8 @@ public class FileUtil {
      */
     public static void zipJson(Path sourcePath) {
         int length;
-        try (FileOutputStream fos =
-                     new FileOutputStream(sourcePath + File.separator + JSON_ZIP_FILE);
-             ZipOutputStream zos =
-                     new ZipOutputStream(fos)
+        try (FileOutputStream fos = new FileOutputStream(sourcePath + File.separator + JSON_ZIP_FILE);
+             ZipOutputStream zos = new ZipOutputStream(fos)
         ) {
             List<Path> allJsonFiles = getFilePaths(sourcePath, ".json");
             for (Path jsonFile : allJsonFiles) {
@@ -93,10 +91,8 @@ public class FileUtil {
      */
     public static void unzip(String zipSourcePath, String outputPath) {
         ZipEntry entry;
-        try (InputStream is =
-                     RepoSense.class.getResourceAsStream(zipSourcePath);
-             ZipInputStream zis =
-                     new ZipInputStream(is)
+        try (InputStream is = RepoSense.class.getResourceAsStream(zipSourcePath);
+             ZipInputStream zis = new ZipInputStream(is)
         ) {
             Files.createDirectories(Paths.get(outputPath));
             while ((entry = zis.getNextEntry()) != null) {
