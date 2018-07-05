@@ -32,6 +32,7 @@ public class FileUtil {
     private static Logger logger = LogsManager.getLogger(FileUtil.class);
 
     private static final String GITHUB_API_DATE_FORMAT = "yyyy-MM-dd";
+    private static final String TEMPLATE_ZIP_ADDRESS = "/templateZip.zip";
     private static final String JSON_ZIP_FILE = "archiveJSON.zip";
     private static final ByteBuffer buffer = ByteBuffer.allocate(1 << 11); // 2KB
 
@@ -68,7 +69,6 @@ public class FileUtil {
      * Creates the zipped folder in the {@code sourcePath}.
      */
     public static void zipJson(Path sourcePath) {
-        int length;
         try (FileOutputStream fos = new FileOutputStream(sourcePath + File.separator + JSON_ZIP_FILE);
              ZipOutputStream zos = new ZipOutputStream(fos)
         ) {
@@ -76,6 +76,7 @@ public class FileUtil {
             for (Path jsonFile : allJsonFiles) {
                 try (InputStream is = Files.newInputStream(jsonFile)) {
                     zos.putNextEntry(new ZipEntry(sourcePath.relativize(jsonFile.toAbsolutePath()).toString()));
+                    int length;
                     while ((length = is.read(buffer.array())) > 0) {
                         zos.write(buffer.array(), 0, length);
                     }
@@ -123,7 +124,7 @@ public class FileUtil {
      * Copies the template files to the {@code outputPath}.
      */
     public static void copyTemplate(String outputPath) {
-        FileUtil.unzip(Constants.TEMPLATE_ZIP_ADDRESS, outputPath);
+        FileUtil.unzip(TEMPLATE_ZIP_ADDRESS, outputPath);
     }
 
     /**
