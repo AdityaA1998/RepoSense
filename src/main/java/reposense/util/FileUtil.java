@@ -30,10 +30,14 @@ import reposense.system.LogsManager;
 
 public class FileUtil {
     private static Logger logger = LogsManager.getLogger(FileUtil.class);
-
     private static final String GITHUB_API_DATE_FORMAT = "yyyy-MM-dd";
-    private static final String TEMPLATE_ZIP_ADDRESS = "/templateZip.zip";
+
+    // zip file which contains all the dashboard template files
+    private static final String TEMPLATE_ZIP_FILE = "/templateZip.zip";
+
+    // zip file which contains all the generated json
     private static final String JSON_ZIP_FILE = "archiveJSON.zip";
+
     private static final ByteBuffer buffer = ByteBuffer.allocate(1 << 11); // 2KB
 
     public static void writeJsonFile(Object object, String path) {
@@ -66,7 +70,7 @@ public class FileUtil {
 
     /**
      * Zips all the JSON files contained in the {@code sourcePath} and its subdirectories.
-     * Creates the zipped folder in the {@code sourcePath}.
+     * Creates the zipped {@code JSON_ZIP_FILE} file in the {@code sourcePath}.
      */
     public static void zipJson(Path sourcePath) {
         try (
@@ -91,15 +95,15 @@ public class FileUtil {
     /**
      * Unzips the contents of the {@code zipSourcePath} and stores in the {@code outputPath}.
      */
-    public static void unzip(String zipSourcePath, String outputPath) {
+    public static void unzip(Path zipSourcePath, Path outputPath) {
         ZipEntry entry;
         try (
-                InputStream is = RepoSense.class.getResourceAsStream(zipSourcePath);
+                InputStream is = RepoSense.class.getResourceAsStream(zipSourcePath.toString());
                 ZipInputStream zis = new ZipInputStream(is)
         ) {
-            Files.createDirectories(Paths.get(outputPath));
+            Files.createDirectories(outputPath);
             while ((entry = zis.getNextEntry()) != null) {
-                Path path = Paths.get(outputPath, entry.getName());
+                Path path = Paths.get(outputPath.toString(), entry.getName());
                 // create the directories of the zip directory
                 if (entry.isDirectory()) {
                     Files.createDirectories(path.toAbsolutePath());
@@ -126,7 +130,7 @@ public class FileUtil {
      * Copies the template files to the {@code outputPath}.
      */
     public static void copyTemplate(String outputPath) {
-        FileUtil.unzip(TEMPLATE_ZIP_ADDRESS, outputPath);
+        FileUtil.unzip(Paths.get(TEMPLATE_ZIP_FILE), Paths.get(outputPath));
     }
 
     /**
