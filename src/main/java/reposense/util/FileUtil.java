@@ -24,7 +24,6 @@ import java.util.zip.ZipOutputStream;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import reposense.RepoSense;
 import reposense.system.LogsManager;
 
 
