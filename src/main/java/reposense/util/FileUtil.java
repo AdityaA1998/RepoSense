@@ -33,8 +33,8 @@ public class FileUtil {
 
     static {
         System.out.println("IN FILEUTIL");
-        URL url = FileUtil.class
-                .getResource("/templateZip.zip");
+        URL url = FileUtil.class.getClassLoader()
+                .getResource("templateZip.zip");
         File file = new File(url.getFile());
         System.out.println(file.toString());
         Path path = file.toPath();
