@@ -24,7 +24,6 @@ import java.util.zip.ZipOutputStream;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import reposense.RepoSense;
 import reposense.system.LogsManager;
 
 
@@ -32,12 +31,8 @@ public class FileUtil {
     private static Logger logger = LogsManager.getLogger(FileUtil.class);
     private static final String GITHUB_API_DATE_FORMAT = "yyyy-MM-dd";
 
-    // zip file which contains all the dashboard template files
-    private static final String TEMPLATE_ZIP_FILE = new File(RepoSense.class.getClassLoader()
-            .getResource("templateZip.zip").getFile()).toString();
-
-    // zip file which contains all the generated json
-    private static final String JSON_ZIP_FILE = "archiveJSON.zip";
+    // zip file which contains all the specified file types
+    private static final String ZIP_FILE = "archive.zip";
 
     private static final ByteBuffer buffer = ByteBuffer.allocate(1 << 11); // 2KB
 
@@ -70,15 +65,23 @@ public class FileUtil {
     }
 
     /**
-     * Zips all the JSON files contained in the {@code sourcePath} and its subdirectories.
-     * Creates the zipped {@code JSON_ZIP_FILE} file in the {@code sourcePath}.
+     * Zips all the files of {@code fileType} contained in the {@code sourceAndOutputPath}
+     * Zipped file is contained in the same location {@code sourceAndOutputPath} as {@code fileTypes}'s location
      */
-    public static void zipJson(Path sourcePath) {
+    public static void zip(Path sourceAndOutputPath, String fileType) {
+        FileUtil.zip(sourceAndOutputPath, sourceAndOutputPath, fileType);
+    }
+
+    /**
+     * Zips all the {@code fileType} files contained in the {@code sourcePath} and its subdirectories.
+     * Creates the zipped {@code ZIP_FILE} file in the {@code outputPath}.
+     */
+    public static void zip(Path sourcePath, Path outputPath, String fileType) {
         try (
-                FileOutputStream fos = new FileOutputStream(sourcePath + File.separator + JSON_ZIP_FILE);
+                FileOutputStream fos = new FileOutputStream(outputPath + File.separator + ZIP_FILE);
                 ZipOutputStream zos = new ZipOutputStream(fos)
         ) {
-            List<Path> allJsonFiles = getFilePaths(sourcePath, ".json");
+            List<Path> allJsonFiles = getFilePaths(sourcePath, fileType);
             for (Path jsonFile : allJsonFiles) {
                 try (InputStream is = Files.newInputStream(jsonFile)) {
                     zos.putNextEntry(new ZipEntry(sourcePath.relativize(jsonFile.toAbsolutePath()).toString()));
@@ -128,10 +131,10 @@ public class FileUtil {
     }
 
     /**
-     * Copies the template files to the {@code outputPath}.
+     * Copies the template files from {@code sourcePath} to the {@code outputPath}.
      */
-    public static void copyTemplate(String outputPath) {
-        FileUtil.unzip(Paths.get(TEMPLATE_ZIP_FILE).toAbsolutePath(), Paths.get(outputPath));
+    public static void copyTemplate(String sourcePath, String outputPath) {
+        FileUtil.unzip(Paths.get(sourcePath).toAbsolutePath(), Paths.get(outputPath));
     }
 
     /**
