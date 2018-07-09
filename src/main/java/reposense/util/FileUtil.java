@@ -32,15 +32,11 @@ public class FileUtil {
     private static Logger logger = LogsManager.getLogger(FileUtil.class);
 
     private static final String GITHUB_API_DATE_FORMAT = "yyyy-MM-dd";
-    private static String TEMPLATE_ZIP_ADDRESS;
+    private static final String TEMPLATE_ZIP_ADDRESS = new File(FileUtil.class
+            .getResource("/templateZip.zip").getFile()).toPath()
+            .toAbsolutePath().toString();
     private static final String JSON_ZIP_FILE = "archiveJSON.zip";
     private static final ByteBuffer buffer = ByteBuffer.allocate(1 << 11); // 1KB
-
-    static {
-        TEMPLATE_ZIP_ADDRESS = new File(FileUtil.class.getClassLoader()
-                .getResource("templateZip.zip").getFile()).toPath()
-                .toAbsolutePath().toString();
-    }
 
     public static void writeJsonFile(Object object, String path) {
         Gson gson = new GsonBuilder()
