@@ -34,7 +34,7 @@ public class FileUtil {
     private static final String GITHUB_API_DATE_FORMAT = "yyyy-MM-dd";
     private static final String TEMPLATE_ZIP_ADDRESS = "/templateZip.zip";
     private static final String JSON_ZIP_FILE = "archiveJSON.zip";
-    private static final ByteBuffer buffer = ByteBuffer.allocate(1 << 11); // 2KB
+    private static final ByteBuffer buffer = ByteBuffer.allocate(1 << 11); // 1KB
 
     public static void writeJsonFile(Object object, String path) {
         Gson gson = new GsonBuilder()
