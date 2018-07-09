@@ -33,7 +33,7 @@ public class FileUtil {
     private static final String GITHUB_API_DATE_FORMAT = "yyyy-MM-dd";
 
     // zip file which contains all the dashboard template files
-    private static final String TEMPLATE_ZIP_FILE = new File(RepoSense.class.getClassLoader()
+    private static final String TEMPLATE_ZIP_FILE = new File(FileUtil.class.getClassLoader()
             .getResource("templateZip.zip").getFile()).toString();
 
     // zip file which contains all the generated json
