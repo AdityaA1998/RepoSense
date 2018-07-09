@@ -1,7 +1,6 @@
 package reposense.util;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -25,6 +24,7 @@ import java.util.zip.ZipOutputStream;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import reposense.RepoSense;
 import reposense.system.LogsManager;
 
 
@@ -32,9 +32,7 @@ public class FileUtil {
     private static Logger logger = LogsManager.getLogger(FileUtil.class);
 
     private static final String GITHUB_API_DATE_FORMAT = "yyyy-MM-dd";
-    private static final String TEMPLATE_ZIP_ADDRESS = new File(FileUtil.class.getClassLoader()
-            .getResource("templateZip.zip").getFile()).toPath()
-            .toAbsolutePath().toString();
+    private static final String TEMPLATE_ZIP_ADDRESS = "/templateZip.zip";
     private static final String JSON_ZIP_FILE = "archiveJSON.zip";
     private static final ByteBuffer buffer = ByteBuffer.allocate(1 << 11); // 1KB
 
@@ -96,7 +94,7 @@ public class FileUtil {
     public static void unzip(String zipSourcePath, String outputPath) {
         ZipEntry entry;
         try (
-                InputStream is = new FileInputStream(zipSourcePath);
+                InputStream is = RepoSense.class.getResourceAsStream(zipSourcePath);
                 ZipInputStream zis = new ZipInputStream(is)
         ) {
             Files.createDirectories(Paths.get(outputPath));
