@@ -24,6 +24,7 @@ import java.util.zip.ZipOutputStream;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import reposense.RepoSense;
 import reposense.system.LogsManager;
 
 
@@ -98,7 +99,7 @@ public class FileUtil {
     public static void unzip(Path zipSourcePath, Path outputPath) {
         ZipEntry entry;
         try (
-                InputStream is = Files.newInputStream(zipSourcePath);
+                InputStream is = RepoSense.class.getResourceAsStream("/templateZip.zip");
                 ZipInputStream zis = new ZipInputStream(is)
         ) {
             Files.createDirectories(outputPath);
