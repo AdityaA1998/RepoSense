@@ -12,6 +12,7 @@ import reposense.parser.CsvParser;
 import reposense.parser.ParseException;
 import reposense.report.ReportGenerator;
 import reposense.system.LogsManager;
+import reposense.util.FileUtil;
 
 public class RepoSense {
     private static final Logger logger = LogsManager.getLogger(RepoSense.class);
@@ -25,6 +26,8 @@ public class RepoSense {
 
             ReportGenerator.generateReposReport(
                     configs, cliArguments.getOutputFilePath().toAbsolutePath().toString());
+
+            FileUtil.zipJson(cliArguments.getOutputFilePath().toAbsolutePath());
         } catch (IOException ioe) {
             logger.log(Level.WARNING, ioe.getMessage(), ioe);
         } catch (ParseException pe) {

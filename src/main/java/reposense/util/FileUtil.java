@@ -2,20 +2,24 @@ package reposense.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -26,8 +30,16 @@ import reposense.system.LogsManager;
 
 public class FileUtil {
     private static Logger logger = LogsManager.getLogger(FileUtil.class);
-
     private static final String GITHUB_API_DATE_FORMAT = "yyyy-MM-dd";
+
+    // zip file which contains all the dashboard template files
+    private static final String TEMPLATE_ZIP_FILE = new File(FileUtil.class.getClassLoader()
+            .getResource("templateZip.zip").getFile()).toString();
+
+    // zip file which contains all the generated json
+    private static final String JSON_ZIP_FILE = "archiveJSON.zip";
+
+    private static final ByteBuffer buffer = ByteBuffer.allocate(1 << 11); // 2KB
 
     public static void writeJsonFile(Object object, String path) {
         Gson gson = new GsonBuilder()
@@ -57,44 +69,59 @@ public class FileUtil {
         }
     }
 
-    public static void unzip(ZipInputStream zipInput, String destinationFolder) {
-        Path directory = Paths.get(destinationFolder);
+    /**
+     * Zips all the JSON files contained in the {@code sourcePath} and its subdirectories.
+     * Creates the zipped {@code JSON_ZIP_FILE} file in the {@code sourcePath}.
+     */
+    public static void zipJson(Path sourcePath) {
+        try (
+                FileOutputStream fos = new FileOutputStream(sourcePath + File.separator + JSON_ZIP_FILE);
+                ZipOutputStream zos = new ZipOutputStream(fos)
+        ) {
+            List<Path> allJsonFiles = getFilePaths(sourcePath, ".json");
+            for (Path jsonFile : allJsonFiles) {
+                try (InputStream is = Files.newInputStream(jsonFile)) {
+                    zos.putNextEntry(new ZipEntry(sourcePath.relativize(jsonFile.toAbsolutePath()).toString()));
+                    int length;
+                    while ((length = is.read(buffer.array())) > 0) {
+                        zos.write(buffer.array(), 0, length);
+                    }
+                }
+            }
+        } catch (IOException ioe) {
+            logger.log(Level.SEVERE, ioe.getMessage(), ioe);
+        }
+    }
 
-        // buffer for read and write data to file
-        byte[] buffer = new byte[2048];
-
-        try {
-            Files.createDirectories(directory);
-            ZipEntry entry = zipInput.getNextEntry();
-
-            while (entry != null) {
-                String entryName = entry.getName();
-                Path path = Paths.get(destinationFolder, entryName);
+    /**
+     * Unzips the contents of the {@code zipSourcePath} and stores in the {@code outputPath}.
+     */
+    public static void unzip(Path zipSourcePath, Path outputPath) {
+        ZipEntry entry;
+        try (
+                InputStream is = RepoSense.class.getResourceAsStream("/templateZip.zip");
+                ZipInputStream zis = new ZipInputStream(is)
+        ) {
+            Files.createDirectories(outputPath);
+            while ((entry = zis.getNextEntry()) != null) {
+                Path path = Paths.get(outputPath.toString(), entry.getName());
                 // create the directories of the zip directory
                 if (entry.isDirectory()) {
-                    Path newDir = Paths.get(path.toAbsolutePath().toString());
-                    Files.createDirectories(newDir);
-                } else {
-                    if (!Files.exists(path.getParent())) {
-                        Files.createDirectories(path.getParent());
-                    }
-                    OutputStream output = Files.newOutputStream(path);
-                    int count = 0;
-                    while ((count = zipInput.read(buffer)) > 0) {
-                        // write 'count' bytes to the file output stream
-                        output.write(buffer, 0, count);
-                    }
-                    output.close();
+                    Files.createDirectories(path.toAbsolutePath());
+                    zis.closeEntry();
+                    continue;
                 }
-                // close ZipEntry and take the next one
-                zipInput.closeEntry();
-                entry = zipInput.getNextEntry();
+                if (!Files.exists(path.getParent())) {
+                    Files.createDirectories(path.getParent());
+                }
+                try (OutputStream output = Files.newOutputStream(path)) {
+                    int length;
+                    while ((length = zis.read(buffer.array())) > 0) {
+                        output.write(buffer.array(), 0, length);
+                    }
+                }
+                zis.closeEntry();
             }
-
-            // close the last ZipEntry
-            zipInput.closeEntry();
-
-            zipInput.close();
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
         }
@@ -104,8 +131,7 @@ public class FileUtil {
      * Copies the template files to the {@code outputPath}.
      */
     public static void copyTemplate(String outputPath) {
-        InputStream is = RepoSense.class.getResourceAsStream(Constants.TEMPLATE_ZIP_ADDRESS);
-        FileUtil.unzip(new ZipInputStream(is), outputPath);
+        FileUtil.unzip(Paths.get(TEMPLATE_ZIP_FILE).toAbsolutePath(), Paths.get(outputPath));
     }
 
     /**
@@ -121,8 +147,16 @@ public class FileUtil {
         }
     }
 
+    /**
+     * Returns a list of {@code Path} of {@code fileType} contained in the given {@code directoryPath} directory.
+     */
+    private static List<Path> getFilePaths(Path directoryPath, String fileType) throws IOException {
+        return Files.walk(directoryPath)
+                .filter(p -> p.toString().endsWith(fileType))
+                .collect(Collectors.toList());
+    }
+
     private static String attachJsPrefix(String original, String prefix) {
         return "var " + prefix + " = " + original;
     }
-
 }
