@@ -5,14 +5,14 @@
 # --no-daemon: Prevent the daemon from launching to prevent file-in-use errors
 #     when we cache the ~/.gradle directory
 build_script:
-    - gradlew.bat --no-daemon clean checkstyleMain checkstyleTest
+    - gradlew.bat -i --no-daemon clean checkstyleMain checkstyleTest
 
 test_script:
-    - appveyor-retry gradlew.bat --no-daemon test functional
+    - appveyor-retry gradlew.bat -i --no-daemon test functional
 
 environment:
     JAVA_HOME: C:\Program Files\Java\jdk9  # Use 64-bit Java
 
 # Files/folders to preserve between builds to speed them up
-#cache:
-#    - C:\Users\appveyor\.gradle
+cache:
+    - C:\Users\appveyor\.gradle
