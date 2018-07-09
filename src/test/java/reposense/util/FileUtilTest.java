@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Comparator;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -51,10 +50,7 @@ public class FileUtilTest {
     public void after() throws IOException, NullPointerException {
         Files.deleteIfExists(ARCHIVE_JSON_ZIP_PATH);
         if (Files.exists(TEMPLATE_DIRECTORY_ABSOLUTE)) {
-            Files.walk(TEMPLATE_DIRECTORY_ABSOLUTE)
-                    .sorted(Comparator.reverseOrder())
-                    .map(Path::toFile)
-                    .forEach(File::delete);
+            FileUtil.deleteDirectory(TEMPLATE_DIRECTORY_ABSOLUTE.toString());
         }
     }
 }
