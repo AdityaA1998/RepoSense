@@ -65,8 +65,8 @@ public class FileUtil {
     }
 
     /**
-     * Zips all the files of {@code fileType} contained in the {@code sourceAndOutputPath}
-     * Zipped file is contained in the same location {@code sourceAndOutputPath} as {@code fileTypes}'s location
+     * Zips all the files of {@code fileType} contained in the {@code sourceAndOutputPath}.
+     * Zipped file is contained in the same location {@code sourceAndOutputPath} as {@code fileTypes}'s location.
      */
     public static void zip(Path sourceAndOutputPath, String fileType) {
         FileUtil.zip(sourceAndOutputPath, sourceAndOutputPath, fileType);
