@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import reposense.RepoSense;
 import reposense.authorship.AuthorshipReporter;
 import reposense.authorship.model.AuthorshipSummary;
 import reposense.commits.CommitsReporter;
@@ -21,7 +22,7 @@ import reposense.util.FileUtil;
 
 public class ReportGenerator {
     private static final Logger logger = LogsManager.getLogger(ReportGenerator.class);
-    private static final String TEMPLATE_ZIP_ADDRESS = new File(FileUtil.class
+    private static final String TEMPLATE_ZIP_ADDRESS = new File(RepoSense.class
             .getResource("/templateZip.zip").getFile()).toPath()
             .toAbsolutePath().toString();
 
