@@ -1,5 +1,6 @@
 package reposense.report;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -7,6 +8,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import reposense.RepoSense;
 import reposense.authorship.AuthorshipReporter;
 import reposense.authorship.model.AuthorshipSummary;
 import reposense.commits.CommitsReporter;
@@ -20,13 +22,14 @@ import reposense.util.FileUtil;
 
 public class ReportGenerator {
     private static final Logger logger = LogsManager.getLogger(ReportGenerator.class);
-
+    private static final String TEMPLATE_ZIP_FILE = new File(RepoSense.class.getClassLoader()
+            .getResource("templateZip.zip").getFile()).toString();
     /**
      * Generates the authorship and commits JSON file for each repo in {@code configs} at {@code outputPath}, as
      * well as the summary JSON file of all the repos.
      */
     public static void generateReposReport(List<RepoConfiguration> configs, String outputPath) {
-        FileUtil.copyTemplate(outputPath);
+        FileUtil.copyTemplate(TEMPLATE_ZIP_FILE, outputPath);
         Path templateLocation = Paths.get(outputPath, Constants.STATIC_INDIVIDUAL_REPORT_TEMPLATE_ADDRESS);
 
         for (RepoConfiguration config : configs) {

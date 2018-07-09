@@ -24,17 +24,12 @@ import java.util.zip.ZipOutputStream;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import reposense.RepoSense;
 import reposense.system.LogsManager;
 
 
 public class FileUtil {
     private static Logger logger = LogsManager.getLogger(FileUtil.class);
     private static final String GITHUB_API_DATE_FORMAT = "yyyy-MM-dd";
-
-    // zip file which contains all the dashboard template files
-    private static final String TEMPLATE_ZIP_FILE = new File(RepoSense.class.getClassLoader()
-            .getResource("templateZip.zip").getFile()).toString();
 
     // zip file which contains all the generated json
     private static final String JSON_ZIP_FILE = "archiveJSON.zip";
@@ -130,8 +125,8 @@ public class FileUtil {
     /**
      * Copies the template files to the {@code outputPath}.
      */
-    public static void copyTemplate(String outputPath) {
-        FileUtil.unzip(Paths.get(TEMPLATE_ZIP_FILE).toAbsolutePath(), Paths.get(outputPath));
+    public static void copyTemplate(String sourcePath, String outputPath) {
+        FileUtil.unzip(Paths.get(sourcePath).toAbsolutePath(), Paths.get(outputPath));
     }
 
     /**
