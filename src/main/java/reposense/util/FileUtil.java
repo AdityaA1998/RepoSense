@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,6 +30,19 @@ import reposense.system.LogsManager;
 
 
 public class FileUtil {
+
+    static {
+        System.out.println("IN FILEUTIL");
+        URL url = FileUtil.class
+                .getResource("/templateZip.zip");
+        File file = new File(url.getFile());
+        System.out.println(file.toString());
+        Path path = file.toPath();
+        System.out.println(path.toString());
+        System.out.println(path.toAbsolutePath().toString());
+    }
+
+
     private static Logger logger = LogsManager.getLogger(FileUtil.class);
 
     private static final String GITHUB_API_DATE_FORMAT = "yyyy-MM-dd";
