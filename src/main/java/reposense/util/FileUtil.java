@@ -152,13 +152,6 @@ public class FileUtil {
     }
 
     /**
-     * Zips all the Json files present in the {@code sourcePath}.
-     */
-    public static void zipJson(Path sourcePath) {
-        FileUtil.zip(sourcePath, ".json");
-    }
-
-    /**
      * Returns a list of {@code Path} of {@code fileType} contained in the given {@code directoryPath} directory.
      */
     private static List<Path> getFilePaths(Path directoryPath, String... fileType) throws IOException {
