@@ -29,12 +29,12 @@ import reposense.system.LogsManager;
 
 
 public class FileUtil {
-    private static Logger logger = LogsManager.getLogger(FileUtil.class);
-    private static final String GITHUB_API_DATE_FORMAT = "yyyy-MM-dd";
 
     // zip file which contains all the specified file types
-    private static final String ZIP_FILE = "archive.zip";
+    public static final String ZIP_FILE = "archive.zip";
 
+    private static Logger logger = LogsManager.getLogger(FileUtil.class);
+    private static final String GITHUB_API_DATE_FORMAT = "yyyy-MM-dd";
     private static final ByteBuffer buffer = ByteBuffer.allocate(1 << 11); // 2KB
 
     public static void writeJsonFile(Object object, String path) {
@@ -66,23 +66,22 @@ public class FileUtil {
     }
 
     /**
-     * Zips all the files of {@code fileType} contained in the {@code sourceAndOutputPath}.
-     * Zipped file is contained in the same location {@code sourceAndOutputPath} as {@code fileTypes}'s location.
+     * Zips all the files of {@code fileTypes} contained in {@code sourceAndOutputPath} directory into the same folder.
      */
-    public static void zip(Path sourceAndOutputPath, String... fileType) {
-        FileUtil.zip(sourceAndOutputPath, sourceAndOutputPath, fileType);
+    public static void zip(Path sourceAndOutputPath, String... fileTypes) {
+        FileUtil.zip(sourceAndOutputPath, sourceAndOutputPath, fileTypes);
     }
 
     /**
-     * Zips all the {@code fileType} files contained in the {@code sourcePath} and its subdirectories.
+     * Zips all the {@code fileTypes} files contained in the {@code sourcePath} and its subdirectories.
      * Creates the zipped {@code ZIP_FILE} file in the {@code outputPath}.
      */
-    public static void zip(Path sourcePath, Path outputPath, String... fileType) {
+    public static void zip(Path sourcePath, Path outputPath, String... fileTypes) {
         try (
                 FileOutputStream fos = new FileOutputStream(outputPath + File.separator + ZIP_FILE);
                 ZipOutputStream zos = new ZipOutputStream(fos)
         ) {
-            List<Path> allJsonFiles = getFilePaths(sourcePath, fileType);
+            List<Path> allJsonFiles = getFilePaths(sourcePath, fileTypes);
             for (Path jsonFile : allJsonFiles) {
                 try (InputStream is = Files.newInputStream(jsonFile)) {
                     zos.putNextEntry(new ZipEntry(sourcePath.relativize(jsonFile.toAbsolutePath()).toString()));
@@ -98,7 +97,7 @@ public class FileUtil {
     }
 
     /**
-     * Unzips the contents of the {@code zipSourcePath} and stores in the {@code outputPath}.
+     * Unzips the contents of the {@code zipSourcePath} into {@code outputPath}.
      */
     public static void unzip(Path zipSourcePath, Path outputPath) {
         ZipEntry entry;
@@ -135,7 +134,7 @@ public class FileUtil {
      * Copies the template files from {@code sourcePath} to the {@code outputPath}.
      */
     public static void copyTemplate(String sourcePath, String outputPath) {
-        FileUtil.unzip(Paths.get(sourcePath).toAbsolutePath(), Paths.get(outputPath));
+        FileUtil.unzip(Paths.get(sourcePath), Paths.get(outputPath));
     }
 
     /**
@@ -152,16 +151,16 @@ public class FileUtil {
     }
 
     /**
-     * Returns a list of {@code Path} of {@code fileType} contained in the given {@code directoryPath} directory.
+     * Returns a list of {@code Path} of {@code fileTypes} contained in the given {@code directoryPath} directory.
      */
-    private static List<Path> getFilePaths(Path directoryPath, String... fileType) throws IOException {
-        List<Path> filteredFilePaths = new ArrayList<>();
-        for (String extension : fileType) {
-            filteredFilePaths.addAll(Files.walk(directoryPath)
+    private static List<Path> getFilePaths(Path directoryPath, String... fileTypes) throws IOException {
+        List<Path> filteredPaths = new ArrayList<>();
+        for (String extension : fileTypes) {
+            Files.walk(directoryPath)
                     .filter(p -> p.toString().endsWith(extension))
-                    .collect(Collectors.toList()));
+                    .collect(Collectors.toList());
         }
-        return filteredFilePaths;
+        return filteredPaths;
     }
 
     private static String attachJsPrefix(String original, String prefix) {

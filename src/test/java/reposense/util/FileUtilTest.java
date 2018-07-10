@@ -17,7 +17,7 @@ public class FileUtilTest {
     private static final Path OUTPUT_DIRECTORY_ABSOLUTE = new File(FileUtilTest.class.getClassLoader()
             .getResource("output").getFile()).toPath().toAbsolutePath();
     private static final Path ARCHIVE_ZIP_PATH = Paths.get(OUTPUT_DIRECTORY_ABSOLUTE.toString(),
-            "archive.zip");
+            FileUtil.ZIP_FILE);
     private static final Path TEMPLATE_ZIP_PATH = new File(FileUtilTest.class.getClassLoader()
             .getResource("output/template.zip").getFile()).toPath().toAbsolutePath();
     private static final Path TEMPLATE_DIRECTORY_ABSOLUTE = Paths.get(OUTPUT_DIRECTORY_ABSOLUTE.toString(), "template");
@@ -38,14 +38,14 @@ public class FileUtilTest {
 
     @Test
     public void zip_validFileType_success() throws IOException {
-        FileUtil.zip(OUTPUT_DIRECTORY_ABSOLUTE, ".csv", ".zip");
+        FileUtil.zip(OUTPUT_DIRECTORY_ABSOLUTE, ".csv");
         Assert.assertTrue(Files.exists(ARCHIVE_ZIP_PATH));
         Assert.assertTrue(Files.size(ARCHIVE_ZIP_PATH) > 0);
     }
 
     @Test
     public void zip_invalidFileType_fail() {
-        FileUtil.zip(REPORT_DIRECTORY_ABSOLUTE, ".jsonnn");
+        FileUtil.zip(REPORT_DIRECTORY_ABSOLUTE, ".pdf");
         Assert.assertFalse(Files.exists(ARCHIVE_ZIP_PATH));
     }
 
