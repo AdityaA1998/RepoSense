@@ -160,7 +160,7 @@ public class FileUtil {
     }
 
     /**
-     * Checks if the {@code path} contains one of {@code fileTypes} extension.
+     * Returns true if the {@code path} contains one of the {@code fileTypes} extension.
      */
     private static boolean isFileTypeInPath(Path path, String... fileTypes) {
         return Arrays.stream(fileTypes).anyMatch(path::endsWith);
