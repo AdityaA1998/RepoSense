@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
@@ -154,13 +154,16 @@ public class FileUtil {
      * Returns a list of {@code Path} of {@code fileTypes} contained in the given {@code directoryPath} directory.
      */
     private static List<Path> getFilePaths(Path directoryPath, String... fileTypes) throws IOException {
-        List<Path> filteredPaths = new ArrayList<>();
-        for (String extension : fileTypes) {
-            Files.walk(directoryPath)
-                    .filter(p -> p.toString().endsWith(extension))
-                    .collect(Collectors.toList());
-        }
-        return filteredPaths;
+        return Files.walk(directoryPath)
+                .filter(p -> FileUtil.isFileTypeInPath(p, fileTypes))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Checks if the {@code path} contains one of {@code fileTypes} extension.
+     */
+    private static boolean isFileTypeInPath(Path path, String... fileTypes) {
+        return Arrays.stream(fileTypes).anyMatch(path::endsWith);
     }
 
     private static String attachJsPrefix(String original, String prefix) {
