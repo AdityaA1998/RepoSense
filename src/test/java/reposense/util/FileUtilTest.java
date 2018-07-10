@@ -38,7 +38,7 @@ public class FileUtilTest {
 
     @Test
     public void zip_validFileType_success() throws IOException {
-        FileUtil.zip(OUTPUT_DIRECTORY_ABSOLUTE, ".csv", ".zip");
+        FileUtil.zip(OUTPUT_DIRECTORY_ABSOLUTE, ".csv");
         Assert.assertTrue(Files.exists(ARCHIVE_ZIP_PATH));
         Assert.assertTrue(Files.size(ARCHIVE_ZIP_PATH) > 0);
     }
