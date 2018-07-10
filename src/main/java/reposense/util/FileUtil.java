@@ -11,6 +11,7 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
@@ -68,7 +69,7 @@ public class FileUtil {
      * Zips all the files of {@code fileType} contained in the {@code sourceAndOutputPath}.
      * Zipped file is contained in the same location {@code sourceAndOutputPath} as {@code fileTypes}'s location.
      */
-    public static void zip(Path sourceAndOutputPath, String fileType) {
+    public static void zip(Path sourceAndOutputPath, String... fileType) {
         FileUtil.zip(sourceAndOutputPath, sourceAndOutputPath, fileType);
     }
 
@@ -76,7 +77,7 @@ public class FileUtil {
      * Zips all the {@code fileType} files contained in the {@code sourcePath} and its subdirectories.
      * Creates the zipped {@code ZIP_FILE} file in the {@code outputPath}.
      */
-    public static void zip(Path sourcePath, Path outputPath, String fileType) {
+    public static void zip(Path sourcePath, Path outputPath, String... fileType) {
         try (
                 FileOutputStream fos = new FileOutputStream(outputPath + File.separator + ZIP_FILE);
                 ZipOutputStream zos = new ZipOutputStream(fos)
@@ -151,12 +152,23 @@ public class FileUtil {
     }
 
     /**
+     * Zips all the Json files present in the {@code sourcePath}.
+     */
+    public static void zipJson(Path sourcePath) {
+        FileUtil.zip(sourcePath, ".json");
+    }
+
+    /**
      * Returns a list of {@code Path} of {@code fileType} contained in the given {@code directoryPath} directory.
      */
-    private static List<Path> getFilePaths(Path directoryPath, String fileType) throws IOException {
-        return Files.walk(directoryPath)
-                .filter(p -> p.toString().endsWith(fileType))
-                .collect(Collectors.toList());
+    private static List<Path> getFilePaths(Path directoryPath, String... fileType) throws IOException {
+        List<Path> filteredFilePaths = new ArrayList<>();
+        for (String extension : fileType) {
+            filteredFilePaths.addAll(Files.walk(directoryPath)
+                    .filter(p -> p.toString().endsWith(extension))
+                    .collect(Collectors.toList()));
+        }
+        return filteredFilePaths;
     }
 
     private static String attachJsPrefix(String original, String prefix) {
