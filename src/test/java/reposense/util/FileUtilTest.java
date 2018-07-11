@@ -18,9 +18,12 @@ public class FileUtilTest {
             .getResource("output").getFile()).toPath().toAbsolutePath();
     private static final Path ARCHIVE_ZIP_PATH = Paths.get(OUTPUT_DIRECTORY_ABSOLUTE.toString(),
             FileUtil.ZIP_FILE);
-    private static final Path TEMPLATE_ZIP_PATH = new File(FileUtilTest.class.getClassLoader()
-            .getResource("output/template.zip").getFile()).toPath().toAbsolutePath();
-    private static final Path TEMPLATE_DIRECTORY_ABSOLUTE = Paths.get(OUTPUT_DIRECTORY_ABSOLUTE.toString(), "template");
+    private static final Path EXPECTED_UNZIPPED_DIRECTORY_PATH = Paths.get(OUTPUT_DIRECTORY_ABSOLUTE.toString(),
+            "expectedUnzip");
+    private static final Path TEST_ZIP_PATH = new File(FileUtilTest.class.getClassLoader()
+            .getResource("output/testZip.zip").getFile()).toPath().toAbsolutePath();
+    private static final Path UNZIPPED_DIRECTORY_PATH = Paths.get(OUTPUT_DIRECTORY_ABSOLUTE.toString(),
+            "UnzippedFolder");
 
     @Test
     public void zip_validLocation_success() throws IOException {
@@ -37,9 +40,10 @@ public class FileUtilTest {
     }
 
     @Test
-    public void unzip_validZipFile_success() {
-        FileUtil.unzip(TEMPLATE_ZIP_PATH, TEMPLATE_DIRECTORY_ABSOLUTE);
-        Assert.assertTrue(Files.exists(TEMPLATE_DIRECTORY_ABSOLUTE));
+    public void unzip_validZipFile_success() throws IOException {
+        FileUtil.unzip(TEST_ZIP_PATH, UNZIPPED_DIRECTORY_PATH);
+        Assert.assertTrue(Files.exists(UNZIPPED_DIRECTORY_PATH));
+        Assert.assertTrue(TestUtil.compareDirectories(UNZIPPED_DIRECTORY_PATH, EXPECTED_UNZIPPED_DIRECTORY_PATH));
     }
 
     @Test
@@ -52,8 +56,8 @@ public class FileUtilTest {
     @After
     public void after() throws IOException, NullPointerException {
         Files.deleteIfExists(ARCHIVE_ZIP_PATH);
-        if (Files.exists(TEMPLATE_DIRECTORY_ABSOLUTE)) {
-            FileUtil.deleteDirectory(TEMPLATE_DIRECTORY_ABSOLUTE.toString());
+        if (Files.exists(UNZIPPED_DIRECTORY_PATH)) {
+            FileUtil.deleteDirectory(UNZIPPED_DIRECTORY_PATH.toString());
         }
     }
 }

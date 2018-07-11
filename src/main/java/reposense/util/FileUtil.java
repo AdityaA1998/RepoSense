@@ -81,10 +81,10 @@ public class FileUtil {
                 FileOutputStream fos = new FileOutputStream(outputPath + File.separator + ZIP_FILE);
                 ZipOutputStream zos = new ZipOutputStream(fos)
         ) {
-            List<Path> allJsonFiles = getFilePaths(sourcePath, fileTypes);
-            for (Path jsonFile : allJsonFiles) {
-                try (InputStream is = Files.newInputStream(jsonFile)) {
-                    zos.putNextEntry(new ZipEntry(sourcePath.relativize(jsonFile.toAbsolutePath()).toString()));
+            List<Path> allFiles = getFilePaths(sourcePath, fileTypes);
+            for (Path path : allFiles) {
+                try (InputStream is = Files.newInputStream(path)) {
+                    zos.putNextEntry(new ZipEntry(sourcePath.relativize(path.toAbsolutePath()).toString()));
                     int length;
                     while ((length = is.read(buffer.array())) > 0) {
                         zos.write(buffer.array(), 0, length);
@@ -163,7 +163,7 @@ public class FileUtil {
      * Returns true if the {@code path} contains one of the {@code fileTypes} extension.
      */
     private static boolean isFileTypeInPath(Path path, String... fileTypes) {
-        return Arrays.stream(fileTypes).anyMatch(path::endsWith);
+        return Arrays.stream(fileTypes).anyMatch(path.toString()::endsWith);
     }
 
     private static String attachJsPrefix(String original, String prefix) {
