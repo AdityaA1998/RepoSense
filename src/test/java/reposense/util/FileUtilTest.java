@@ -30,23 +30,10 @@ public class FileUtilTest {
     }
 
     @Test
-    public void zip_invalidLocation_fail() {
-        Path invalidZipLocation = Paths.get("./zipDoesNotExist.zip");
-        FileUtil.zip(invalidZipLocation, ".json");
-        Assert.assertFalse(Files.exists(ARCHIVE_ZIP_PATH));
-    }
-
-    @Test
     public void zip_validFileType_success() throws IOException {
         FileUtil.zip(OUTPUT_DIRECTORY_ABSOLUTE, ".csv");
         Assert.assertTrue(Files.exists(ARCHIVE_ZIP_PATH));
         Assert.assertTrue(Files.size(ARCHIVE_ZIP_PATH) > 0);
-    }
-
-    @Test
-    public void zip_invalidFileType_fail() {
-        FileUtil.zip(REPORT_DIRECTORY_ABSOLUTE, ".pdf");
-        Assert.assertFalse(Files.exists(ARCHIVE_ZIP_PATH));
     }
 
     @Test
