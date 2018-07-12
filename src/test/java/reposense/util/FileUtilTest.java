@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.stream.Collectors;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -29,7 +30,8 @@ public class FileUtilTest {
     public void zip_validLocation_success() throws IOException {
         FileUtil.zip(REPORT_DIRECTORY_ABSOLUTE, OUTPUT_DIRECTORY_ABSOLUTE, ".json");
         Assert.assertTrue(Files.exists(ARCHIVE_ZIP_PATH));
-        Assert.assertTrue(Files.size(ARCHIVE_ZIP_PATH) > 0);
+        Assert.assertTrue(Files.size(ARCHIVE_ZIP_PATH)
+                == Files.size(Paths.get(OUTPUT_DIRECTORY_ABSOLUTE.toString(), "expectedArchive.zip")));
     }
 
     @Test
@@ -43,6 +45,8 @@ public class FileUtilTest {
     public void unzip_validZipFile_success() throws IOException {
         FileUtil.unzip(TEST_ZIP_PATH, UNZIPPED_DIRECTORY_PATH);
         Assert.assertTrue(Files.exists(UNZIPPED_DIRECTORY_PATH));
+        System.out.println(Files.size(UNZIPPED_DIRECTORY_PATH));
+        System.out.println(Files.walk(UNZIPPED_DIRECTORY_PATH).sorted().collect(Collectors.toList()));
         Assert.assertTrue(TestUtil.compareDirectories(UNZIPPED_DIRECTORY_PATH, EXPECTED_UNZIPPED_DIRECTORY_PATH));
     }
 
