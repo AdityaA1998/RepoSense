@@ -33,6 +33,8 @@ public class FileUtilTest {
         Assert.assertTrue(Files.exists(ARCHIVE_ZIP_PATH));
         System.out.println(Files.size(ARCHIVE_ZIP_PATH));
         System.out.println(Files.size(Paths.get(OUTPUT_DIRECTORY_ABSOLUTE.toString(), "expectedArchive.zip")));
+        FileUtil.unzip(ARCHIVE_ZIP_PATH, UNZIPPED_DIRECTORY_PATH);
+        System.out.println(Files.walk(UNZIPPED_DIRECTORY_PATH).sorted().collect(Collectors.toList()));
         Assert.assertTrue(Files.size(ARCHIVE_ZIP_PATH)
                 == Files.size(Paths.get(OUTPUT_DIRECTORY_ABSOLUTE.toString(), "expectedArchive.zip")));
     }
