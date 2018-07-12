@@ -1,0 +1,32 @@
+{
+  "authorWeeklyIntervalContributions": {
+    "charlesgoh": [],
+    "jeffreygohkw": [],
+    "Esilocke": [],
+    "wangyiming1019": []
+  },
+  "authorDailyIntervalContributions": {
+    "charlesgoh": [],
+    "jeffreygohkw": [],
+    "Esilocke": [],
+    "wangyiming1019": []
+  },
+  "authorFinalContributionMap": {
+    "charlesgoh": 0,
+    "jeffreygohkw": 0,
+    "Esilocke": 0,
+    "wangyiming1019": 0
+  },
+  "authorContributionVariance": {
+    "charlesgoh": 0.0,
+    "jeffreygohkw": 0.0,
+    "Esilocke": 0.0,
+    "wangyiming1019": 0.0
+  },
+  "authorDisplayNameMap": {
+    "charlesgoh": "Cha",
+    "jeffreygohkw": "Jef",
+    "Esilocke": "Esi",
+    "wangyiming1019": "Wan"
+  }
+}
