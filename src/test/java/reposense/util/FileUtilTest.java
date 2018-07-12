@@ -29,6 +29,7 @@ public class FileUtilTest {
     @Test
     public void zip_validLocation_success() throws IOException {
         FileUtil.zip(REPORT_DIRECTORY_ABSOLUTE, OUTPUT_DIRECTORY_ABSOLUTE, ".json");
+        System.out.println(Files.walk(REPORT_DIRECTORY_ABSOLUTE).sorted().collect(Collectors.toList()));
         Assert.assertTrue(Files.exists(ARCHIVE_ZIP_PATH));
         System.out.println(Files.size(ARCHIVE_ZIP_PATH));
         System.out.println(Files.size(Paths.get(OUTPUT_DIRECTORY_ABSOLUTE.toString(), "expectedArchive.zip")));
