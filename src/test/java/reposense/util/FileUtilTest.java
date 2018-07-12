@@ -22,7 +22,7 @@ public class FileUtilTest {
     private static final Path EXPECTED_UNZIPPED_DIRECTORY_PATH = Paths.get(OUTPUT_DIRECTORY_ABSOLUTE.toString(),
             "expectedUnzip");
     private static final Path TEST_ZIP_PATH = new File(FileUtilTest.class.getClassLoader()
-            .getResource("output/testZip.zip").getFile()).toPath().toAbsolutePath();
+            .getResource("archive.zip").getFile()).toPath().toAbsolutePath();
     private static final Path UNZIPPED_DIRECTORY_PATH = Paths.get(OUTPUT_DIRECTORY_ABSOLUTE.toString(),
             "UnzippedFolder");
 
@@ -41,7 +41,7 @@ public class FileUtilTest {
 
     @Test
     public void zip_validFileType_success() throws IOException {
-        FileUtil.zip(OUTPUT_DIRECTORY_ABSOLUTE, ".csv");
+        FileUtil.zip(Paths.get("/Users/Aditya/Desktop/testZip"), ".txt");
         Assert.assertTrue(Files.exists(ARCHIVE_ZIP_PATH));
         Assert.assertTrue(Files.size(ARCHIVE_ZIP_PATH) > 0);
     }
