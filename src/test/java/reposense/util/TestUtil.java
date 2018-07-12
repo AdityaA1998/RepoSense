@@ -70,6 +70,8 @@ public class TestUtil {
                 .sorted()
                 .collect(Collectors.toList());
 
+        System.out.println(expectedPaths.toString());
+        System.out.println(actualPaths.toString());
         if (expectedPaths.size() != actualPaths.size()) {
             return false;
         }
@@ -79,6 +81,7 @@ public class TestUtil {
                     && !TestUtil.compareFileContents(expectedPaths.get(i), actualPaths.get(i))) {
                 return false;
             }
+            System.out.println(i);
         }
         return true;
     }
