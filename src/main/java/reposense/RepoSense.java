@@ -32,7 +32,7 @@ public class RepoSense {
             ReportGenerator.generateReposReport(
                     configs, cliArguments.getOutputFilePath().toAbsolutePath().toString());
 
-            FileUtil.zip(cliArguments.getOutputFilePath().toAbsolutePath(), ".json");
+            FileUtil.zip(cliArguments.getOutputFilePath().getParent().toAbsolutePath(), ".json");
         } catch (IOException ioe) {
             logger.log(Level.WARNING, ioe.getMessage(), ioe);
         } catch (ParseException pe) {
